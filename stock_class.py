@@ -4,6 +4,9 @@
 
 class Stock:
     def __init__(self, symbol, name, shares):
+        if not symbol or not name: #missing symbol or name
+            raise ValueError("Stock needs a symbol and a name")
+        
         self.symbol = symbol
         self.name = name
         self.shares = shares
@@ -11,10 +14,16 @@ class Stock:
 
         #Add DailyData
     def add_data(self, stock_data):
+        if not stock_data.date: #missing date
+            raise ValueError("Stock data requires a date")
+        
         self.DataList.append(stock_data)
 
 class DailyData:
     def __init__(self, date, close, volume):
+        if not date: #missing date
+            raise ValueError("Missing Date")
+
         self.date = date
         self.close = close
         self.volume = volume
