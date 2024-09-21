@@ -6,7 +6,7 @@ Created on Mon Aug 30 22:57:11 2021
 
 #Name: Michelle Buchholz
 #Class: CEIS150 - Sep 2024 Session
-#Date: 
+#Date: 09/20/24
 
 from datetime import datetime
 from stock_class import Stock, DailyData
