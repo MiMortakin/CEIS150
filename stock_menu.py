@@ -6,11 +6,11 @@ Created on Mon Aug 30 22:57:11 2021
 
 #Name: Michelle Buchholz
 #Class: CEIS150 - Sep 2024 Session
-#Date: 09/20/24
+#Date: 
 
 from datetime import datetime
 from stock_class import Stock, DailyData
-#from account_class import  Traditional, Robo
+from account_class import  Traditional, Robo
 import matplotlib.pyplot as plt
 import csv
 
@@ -122,7 +122,41 @@ def add_stock_data(stock_list):
        
     
 def investment_type(stock_list):
-    print("This method is under construction")
+    print("Investment Account ---")
+    balance = float(input("What is your initial balance: "))
+    number = input("What is your account number: ")
+    acct= input("Do you want a Traditional (t) or Robo (r) account: ")
+    if acct.lower() == "r":
+        years = float(input("How many years until retirement: "))
+        robo_acct = Robo(balance, number, years)
+        print("Your investment return is ",robo_acct.investment_return())
+        print("\n\n")
+    elif acct.lower() == "t":
+        trad_acct = Traditional(balance, number)
+        temp_list=[]
+        print("Choose stocks from the list below: ")
+        while True:
+            print("Stock List: [",end="")
+            for stock in stock_list:
+                print(stock.symbol," ",end="")
+            print("]")
+            symbol = input("Which stock do you want to purchase, 0 to quit: ").upper()
+            if symbol =="0":
+                break
+            shares = float(input("How many shares do you want to buy?: "))
+            found = False
+            for stock in stock_list:
+              if stock.symbol == symbol:
+                  found = True
+                  current_stock = stock
+            if found == True:
+                current_stock.shares += shares 
+                temp_list.append(current_stock)
+                print("Bought ",shares,"of",symbol)
+            else:
+                print("Symbol Not Found ***")
+        trad_acct.add_stock(temp_list)
+
 
 # Function to create stock chart
 def display_stock_chart(stock_list,symbol):
