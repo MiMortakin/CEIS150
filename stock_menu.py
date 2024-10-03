@@ -9,6 +9,7 @@ Created on Mon Aug 30 22:57:11 2021
 #Date: 
 
 from datetime import datetime
+from venv import create
 from stock_class import Stock, DailyData
 from account_class import  Traditional, Robo
 import matplotlib.pyplot as plt
@@ -27,7 +28,7 @@ def add_stock(stock_list):
           new_stock = Stock(symbol, name, shares)
           stock_list.append(new_stock)
 
-          option = input("Press 'Enter' to add another stock or '0' to Stop")
+          option = input("Press 'Enter' to add another stock or '0' to Stop: ")
 
 
 # Remove stock and all daily data
@@ -160,13 +161,60 @@ def investment_type(stock_list):
 
 # Function to create stock chart
 def display_stock_chart(stock_list,symbol):
-    print("This method is under construction")
+
+#Creates lists for date, price, volume
+    date = []
+    price = []
+    volume = []
+    company = ""
+
+# Loops through the stock_list to find stock by symbol
+    for stock in stock_list:
+        if stock.symbol == symbol: 
+            company = stock.name
+# Loops through the daily data of the stock
+            for dailyData in stock.DataList:
+                date.append(dailyData.date)
+                price.append(dailyData.close)
+                volume.append(dailyData.volume)
+
+#Plotting 
+    plt.plot(date, price)
+    plt.xlabel('Date')
+    plt.ylabel('Price')
+    plt.title(company)
+    plt.show()
 
 # Display Chart
 def display_chart(stock_list):
-    print("This method is under construction")
+# Output the stock list
+    print("Stock List: [", end="")
+    for stock in stock_list:
+        print(stock.symbol + " ", end="")
+    print("]")
   
+# Input symbol from user
+    symbol = input("Enter Stock Symbol: ").upper()
 
+#Initialize found as False
+    found = False
+    current_stock = None
+
+#Search for stock by symbol
+    for stock in stock_list:
+        if stock.symbol == symbol:
+            found = True
+            current_stock = stock
+            break
+
+# If the stock is found, displays chart
+    if found:
+        display_stock_chart(stock_list, symbol)
+    else: 
+        print(f"Error: Stock Symbol '{symbol}' not Found.")
+
+# Pause and Prompt User for Enter to Continue
+    input("Press Enter to Continue....")
 
                 
  # Get price and volume history from Yahoo! Finance using CSV import.
