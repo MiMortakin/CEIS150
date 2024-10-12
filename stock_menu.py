@@ -29,6 +29,7 @@ def add_stock(stock_list):
           stock_list.append(new_stock)
 
           option = input("Press 'Enter' to add another stock or '0' to Stop: ")
+print()
 
 
 # Remove stock and all daily data
@@ -217,13 +218,130 @@ def display_chart(stock_list):
     input("Press Enter to Continue....")
 
                 
- # Get price and volume history from Yahoo! Finance using CSV import.
+ # Get price and volume history from Yahoo! Finance using CSV import. - I used Google Finance & Sheets
 def import_stock_csv(stock_list):
-    print("This method is under construction")
+    print("\n=== Import Stock ===")
+    
+    # Display available stocks
+    print("Stock List: [", end="")
+    for stock in stock_list:
+        print(stock.symbol, end=" ")
+    print("]")
+
+    # Input for symbol and filename
+    symbol = input("Please Enter the stock symbol: ").upper()
+    filename = input("Please Enter the Filename (including the .csv): ")
+
+    # Attempt to find the stock in the stock list
+    stock_found = None
+    for stock in stock_list:
+        if stock.symbol == symbol:
+            stock_found = stock
+            break
+    
+    if stock_found is None:
+        print(f"Error: Stock Symbol '{symbol}' not found in stock list.")
+        return
+
+    # Try to open the file and read data
+    try:
+        print(f"Attempting to open file: {filename}")
+        with open(filename, mode='r') as stockdata:
+            datareader = csv.reader(stockdata, delimiter=',')
+            next(datareader)  # Skip the header row
+            
+            for row in datareader:
+                if len(row) < 7:  # Check if the row has enough columns
+                    print("Warning: Row does not contain enough columns, skipping row.")
+                    continue
+                
+                # Create DailyData object
+                daily_data = DailyData(
+                    datetime.strptime(row[0], "%Y/%m/%d"),
+                    float(row[4]),
+                    float(row[6])
+                )
+                stock_found.add_data(daily_data)
+                print(f"Added data for {daily_data.date.strftime('%Y/%m/%d')} - Price: {daily_data.close}, Volume: {daily_data.volume}")
+
+    except FileNotFoundError:
+        print(f"Error: The file '{filename}' was not found.")
+    except Exception as e:
+        print(f"An error has occurred: {str(e)}")
+
+    # Optionally call the display_report function to show the updated data
+    display_report(stock_list)
+
     
    # Display Report 
 def display_report(stock_list):
-    print("This method is under construction")
+    print("\n=== Stock Report ===")
+    
+    # Loop through each stock in stock_list
+    for stock in stock_list:
+        print(f"Report for: {stock.symbol} - {stock.name}")
+        print(f"Shares: {stock.shares}")
+        
+        # Initialize variables for summary
+        count = 0
+        price_total = 0
+        volume_total = 0
+        lowPrice = 999999.99
+        highPrice = 0
+        lowVolume = 999999999999
+        highVolume = 0
+        startPrice = 0
+        endPrice = 0
+        
+        # Check if there is any historical data for the stock
+        if not stock.DataList:
+            print("No daily history available")
+        else:
+            # Loop through daily data
+            for i, daily_data in enumerate(stock.DataList):
+                count += 1
+                price_total += daily_data.close
+                volume_total += daily_data.volume
+                
+                # Set starting price (first day)
+                if i == 0:
+                    startPrice = daily_data.close
+                
+                # Set ending price (latest day)
+                endPrice = daily_data.close
+                
+                # Compare and update low/high prices and volumes
+                if daily_data.close < lowPrice:
+                    lowPrice = daily_data.close
+                if daily_data.close > highPrice:
+                    highPrice = daily_data.close
+                if daily_data.volume < lowVolume:
+                    lowVolume = daily_data.volume
+                if daily_data.volume > highVolume:
+                    highVolume = daily_data.volume
+
+            # Calculate price change and profit/loss
+            priceChange = endPrice - startPrice
+            profit_or_loss = priceChange * stock.shares
+            
+            # Output summary information
+            print("Summary ---")
+            print("Low Price:", "${:,.2f}".format(lowPrice))
+            print("High Price:", "${:,.2f}".format(highPrice))
+            print("Average Price:", "${:,.2f}".format(price_total / count))
+            print("Low Volume:", "{:,}".format(lowVolume))
+            print("High Volume:", "{:,}".format(highVolume))
+            print("Average Volume:", "{:,}".format(volume_total // count))
+            print("Change in Price:", "${:,.2f}".format(priceChange))
+            print("Profit/Loss:", "${:,.2f}".format(profit_or_loss))
+        
+        # Print blank lines to separate reports for each stock
+        print("\n" + "-" * 40 + "\n")
+    
+    print("Report Complete")
+    input("Press Enter to continue...")
+
+
     
 def main_menu(stock_list):
     option = ""
